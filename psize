@@ -1,0 +1,19 @@
+#!/bin/bash
+
+for f in $1;do
+
+xr=`exiftool -T -xresolution $f`
+yr=`exiftool -T -xresolution $f`
+ix=`exiftool -T -ImageWidth $f`
+iy=`exiftool -T -ImageHeight $f`
+
+fn=`exiftool -T -filename $f`
+
+px=`echo "scale=2;$ix/$xr" |bc`
+py=`echo "scale=2;$iy/$yr" |bc`
+
+sqin=`echo "scale=1;$px*$py" |bc`
+
+echo -e "$fn $px X $py ($sqin sq. in)"
+
+done

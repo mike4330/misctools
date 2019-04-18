@@ -1,0 +1,15 @@
+#!/bin/bash
+
+f=`exiftool -Description $1 |awk '{print $4}'` 
+
+g="$f"_"$1"med.jpg
+
+echo f is $g
+
+
+convert -resize 800x800 $1 $g
+scp $g ganymede:/var/www/html/mags/images
+scp $g ganymede:/var/www/html/mags/publicweb/images
+#rsync -avu ganymede:/var/www/html/mags/mags.sqlite /tmp/
+#sqlite3 /tmp/mags.sqlite "INSERT into images (catalog,path) VALUES ('$f','images/$g');"
+#rsync -uav /tmp/mags.sqlite ganymede:/var/www/html/mags/
