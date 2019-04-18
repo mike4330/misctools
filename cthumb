@@ -1,0 +1,29 @@
+#!/bin/bash
+
+f=`exiftool -Description $1 |awk '{print $4}'` 
+
+g="$f"_"$1"icon.jpg
+
+fullname="$f"_"$1"coverfull.jpg
+
+g2=`echo $g |sed 's/.tiff\|.png//g'`
+
+fn=`echo $fullname |sed 's/.tiff\|.png//g'`
+
+echo f is $g2
+echo fn is $fn
+
+
+convert -resize 100x $1 $g2
+
+convert -resize x800 $1 $fn
+
+scp $g2 ganymede:/var/www/html/mags/images/
+scp $g2 ganymede:/var/www/html/mags/publicweb/images/
+
+scp $fn ganymede:/var/www/html/mags/publicweb/images/
+
+rsync -avu ganymede:/var/www/html/mags/mags.sqlite /tmp/
+sqlite3 /tmp/mags.sqlite "update main set iconpath = 'images/$g2',iconpath_L = 'images/$fn'  where id = '$f'"
+echo "sql is update main set iconpath = 'images/$g2' where id = '$f'"
+rsync -uav /tmp/mags.sqlite ganymede:/var/www/html/mags/
