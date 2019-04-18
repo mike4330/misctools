@@ -1,0 +1,20 @@
+#!/bin/bash
+
+TEMPDB='/tmp/mags.sqlite'
+
+f=`exiftool -Description $1 |awk '{print $4}'` 
+
+g="$f"_"$1"med.jpg
+
+g2=`echo $g |sed 's/.tiff\|.png//g'`
+
+echo f is $g2
+
+
+convert -resize 800x800 $1 $g2
+scp $g2 ganymede:/var/www/html/mags/images/
+scp $g2 ganymede:/var/www/html/mags/publicweb/images/
+rsync -avu ganymede:/var/www/html/mags/mags.sqlite /tmp/
+sqlite3 /tmp/mags.sqlite "INSERT into images (catalog,path) VALUES ('$f','images/$g2');"
+rsync -uav /tmp/mags.sqlite ganymede:/var/www/html/mags/
+scp $TEMPDB ganymede:/mnt/disk2/backup/mags`date +%Y%m%d.%H%M%S`.sqlite
